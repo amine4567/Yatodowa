@@ -28,5 +28,8 @@
 		"eamodio.gitlens"
 	],
 	"remoteUser": "root",
-	"postCreateCommand": "pip install -r requirements-combined.txt"
+	"postCreateCommand": "pip install -r requirements-combined.txt",
+	"remoteEnv": {
+		"PYTHONPATH": "/workspace/backend"
+	},
 }

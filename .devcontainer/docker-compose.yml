@@ -5,6 +5,8 @@ services:
     entrypoint: ["tail", "-f", "/dev/null"]
     volumes:
       - ..:/workspace
-  mongo:
-    image: "mongo:5.0"
+  postgres:
+    image: "postgres:14.2"
+    environment: 
+      POSTGRES_HOST_AUTH_METHOD: trust
     

@@ -1,23 +1,25 @@
 from invoke import task
 
+from backend.yatodowa_api.app import create_app
+
 
 # Python reqs
 @task
 def update_app_reqs(c):
-    c.run("pip-compile src/requirements.in")
+    c.run("pip-compile backend/requirements.in")
 
 
 @task
 def update_combined_reqs(c):
     c.run(
-        "pip-compile src/requirements.in requirements-dev.in -o requirements-combined.txt"
+        "pip-compile backend/requirements.in requirements-dev.in -o requirements-combined.txt"
     )
 
 
 # Run
 @task
 def run_backend(c):
-    c.run("cd backend/yatodowa_api; flask run")
+    create_app().run()
 
 
 @task
