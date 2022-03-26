@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Local config files
-config/local/*
+config/local/* 
+!config/local/.gitkeep
