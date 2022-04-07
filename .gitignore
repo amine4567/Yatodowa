@@ -131,3 +131,7 @@ dmypy.json
 # Local config files
 config/local/* 
 !config/local/.gitkeep
+
+# Node
+node_modules
+*/.angular/cache

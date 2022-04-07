@@ -25,11 +25,11 @@
 	"extensions": [
 		"ms-python.python",
 		"ms-python.vscode-pylance",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"angular.ng-template"
 	],
 	"remoteUser": "root",
-	"postCreateCommand": "pip install -r requirements-combined.txt",
 	"remoteEnv": {
-		"PYTHONPATH": "/workspace/backend"
+		"PYTHONPATH": "/workspace/backend/src"
 	},
 }

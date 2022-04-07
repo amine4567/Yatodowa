@@ -15,7 +15,7 @@ def create_app(custom_config_dirpath: Optional[str] = None) -> Flask:
     app_config_dirpath = Path(
         custom_config_dirpath
         or os.getenv("APP_CONFIG_DIR", None)
-        or Path(app.root_path).parent.parent / "config" / "local"
+        or Path(app.root_path).parent.parent.parent / "config" / "local"
     )
 
     app.config.from_file(str(app_config_dirpath / "flask.yml"), load=yaml.safe_load)
