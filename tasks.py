@@ -29,3 +29,19 @@ def run_front(c):
 @task
 def run(c):
     run_back(c)
+
+
+# Flask-migrate
+@task
+def db_init(c):
+    c.run("cd backend/src/yatodowa_api; flask db init")
+
+
+@task
+def db_migrate(c, message):
+    c.run(f'cd backend/src/yatodowa_api; flask db migrate -m "{message}"')
+
+
+@task
+def db_upgrade(c):
+    c.run("cd backend/src/yatodowa_api; flask db upgrade")
