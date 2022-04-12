@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=backend/requirements-combined.txt backend/requirements-dev.in backend/src/requirements.in
 #
+alembic==1.7.7
+    # via flask-migrate
 black==22.1.0
     # via -r backend/requirements-dev.in
 click==8.0.4
@@ -16,9 +18,14 @@ flake8==4.0.1
 flask==2.0.3
     # via
     #   -r backend/src/requirements.in
+    #   flask-migrate
     #   flask-sqlalchemy
-flask-sqlalchemy==2.5.1
+flask-migrate==3.1.0
     # via -r backend/src/requirements.in
+flask-sqlalchemy==2.5.1
+    # via
+    #   -r backend/src/requirements.in
+    #   flask-migrate
 greenlet==1.1.2
     # via sqlalchemy
 invoke==1.6.0
@@ -27,8 +34,12 @@ itsdangerous==2.1.0
     # via flask
 jinja2==3.0.3
     # via flask
+mako==1.2.0
+    # via alembic
 markupsafe==2.1.0
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
 mccabe==0.6.1
     # via flake8
 mypy==0.931
@@ -54,7 +65,9 @@ pyflakes==2.4.0
 pyyaml==6.0
     # via -r backend/src/requirements.in
 sqlalchemy==1.4.32
-    # via flask-sqlalchemy
+    # via
+    #   alembic
+    #   flask-sqlalchemy
 tomli==2.0.1
     # via
     #   black

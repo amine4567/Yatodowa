@@ -4,27 +4,40 @@
 #
 #    pip-compile backend/src/requirements.in
 #
+alembic==1.7.7
+    # via flask-migrate
 click==8.0.4
     # via flask
 flask==2.0.3
     # via
     #   -r backend/src/requirements.in
+    #   flask-migrate
     #   flask-sqlalchemy
-flask-sqlalchemy==2.5.1
+flask-migrate==3.1.0
     # via -r backend/src/requirements.in
+flask-sqlalchemy==2.5.1
+    # via
+    #   -r backend/src/requirements.in
+    #   flask-migrate
 greenlet==1.1.2
     # via sqlalchemy
 itsdangerous==2.1.0
     # via flask
 jinja2==3.0.3
     # via flask
+mako==1.2.0
+    # via alembic
 markupsafe==2.1.0
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
 psycopg2==2.9.3
     # via -r backend/src/requirements.in
 pyyaml==6.0
     # via -r backend/src/requirements.in
 sqlalchemy==1.4.32
-    # via flask-sqlalchemy
+    # via
+    #   alembic
+    #   flask-sqlalchemy
 werkzeug==2.0.3
     # via flask
