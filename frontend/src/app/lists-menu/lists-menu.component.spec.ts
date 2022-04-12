@@ -8,9 +8,8 @@ describe('ListsMenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListsMenuComponent ]
-    })
-    .compileComponents();
+      declarations: [ListsMenuComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

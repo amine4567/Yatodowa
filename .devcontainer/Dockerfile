@@ -3,6 +3,9 @@ FROM node:16
 # Install Angular CLI
 RUN npm install -g @angular/cli
 
+# Install prettier
+RUN npm install -g prettier
+
 # Install python 3.10 (from source)
 RUN apt update &&\
     apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev &&\

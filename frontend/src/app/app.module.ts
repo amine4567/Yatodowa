@@ -13,14 +13,10 @@ import { ListsMenuComponent } from './lists-menu/lists-menu.component';
     AppComponent,
     TopBarComponent,
     CurrentTasksListComponent,
-    ListsMenuComponent
+    ListsMenuComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule
-  ],
+  imports: [BrowserModule, AppRoutingModule, FormsModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

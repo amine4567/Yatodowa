@@ -8,9 +8,8 @@ describe('TopBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TopBarComponent ]
-    })
-    .compileComponents();
+      declarations: [TopBarComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
