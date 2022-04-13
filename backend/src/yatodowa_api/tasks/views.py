@@ -33,10 +33,10 @@ def get_lists():
 
 @tasks_api.route(COMMON_ENDPOINT + "/add_list")
 def add_list():
-    tasks_list = TasksLists(name="list2")
+    tasks_list = TasksLists(list_name="list2")
     db.session.add(tasks_list)
     db.session.commit()
-    return jsonify(tasks_list.name), 201
+    return jsonify(tasks_list.list_name), 201
 
 
 # Tasks
@@ -49,7 +49,7 @@ def get_tasks():
 @tasks_api.route(COMMON_ENDPOINT + "/add_task")
 def add_task():
     task = Tasks(
-        text="lorem ipsum somthing somewhere haha", completed=False, list_name="list5"
+        text="lorem ipsum somthing somewhere haha", completed=False, list_name="list2"
     )
     db.session.add(task)
     db.session.commit()
