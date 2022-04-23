@@ -5,9 +5,10 @@ from typing import Optional
 import yaml
 from flask import Flask
 from flask_migrate import Migrate
-
+from yatodowa_api.groups.controller import groups_api
 from yatodowa_api.sqldb import get_db
-from yatodowa_api.tasks.views import tasks_api
+from yatodowa_api.tasks.controller import tasks_api
+from yatodowa_api.tasks_lists.controller import tasks_lists_api
 
 
 def create_app(custom_config_dirpath: Optional[str] = None) -> Flask:
@@ -25,9 +26,8 @@ def create_app(custom_config_dirpath: Optional[str] = None) -> Flask:
     db.init_app(app)
     migrate = Migrate(app, db)
 
-    # with app.app_context():
-    #     db.create_all()
-
     app.register_blueprint(tasks_api)
+    app.register_blueprint(tasks_lists_api)
+    app.register_blueprint(groups_api)
 
     return app
