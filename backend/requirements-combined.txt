@@ -30,6 +30,8 @@ greenlet==1.1.2
     # via sqlalchemy
 invoke==1.6.0
     # via -r backend/requirements-dev.in
+isort==5.10.1
+    # via -r backend/requirements-dev.in
 itsdangerous==2.1.0
     # via flask
 jinja2==3.0.3
