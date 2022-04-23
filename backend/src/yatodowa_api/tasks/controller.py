@@ -16,7 +16,7 @@ def get_tasks():
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    mandatory_fields = set(["text", "list_name"])
+    mandatory_fields = set(["text", "collection_name"])
 
     try:
         missing_fields = mandatory_fields - set(request_body.keys())
@@ -33,7 +33,7 @@ def add_task():
         )
 
     task = TaskService.add_task(
-        text=request_body["text"], list_name=request_body["list_name"]
+        text=request_body["text"], collection_name=request_body["collection_name"]
     )
 
     return (

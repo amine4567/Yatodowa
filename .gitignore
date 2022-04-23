@@ -135,3 +135,6 @@ config/local/*
 # Node
 node_modules
 */.angular/cache
+
+# Misc
+_personal

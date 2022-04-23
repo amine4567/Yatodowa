@@ -8,32 +8,33 @@ from yatodowa_api.sqldb import get_db
 db: SQLAlchemy = get_db()
 
 
-class ListsGroups(db.Model):
-    __tablename__ = "lists_groups"
-    group_name = db.Column(db.String(20), primary_key=True)
+class Group(db.Model):
+    __tablename__ = "groups"
+    group_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = db.Column(db.String(20), unique=True)
 
 
-class TasksLists(db.Model):
-    __tablename__ = "tasks_lists"
-    list_name = db.Column(db.String(20), primary_key=True)
-    group_name = db.Column(
-        db.String(20), db.ForeignKey("lists_groups.group_name"), nullable=True
-    )
+class Collection(db.Model):
+    __tablename__ = "collections"
+    collection_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = db.Column(db.String(20), unique=True)
+    group_name = db.Column(db.String(20), db.ForeignKey("groups.name"), nullable=True)
 
     def to_dict(self):
         return {
-            "list_name": self.list_name,
+            "collection_id": self.collection_id,
+            "name": self.name,
             "group_name": self.group_name,
         }
 
 
-class Tasks(db.Model):
+class Task(db.Model):
     __tablename__ = "tasks"
     task_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     text = db.Column(db.String(200))
     completed = db.Column(db.Boolean, default=False)
-    list_name = db.Column(
-        db.String(20), db.ForeignKey("tasks_lists.list_name"), nullable=False
+    collection_name = db.Column(
+        db.String(20), db.ForeignKey("collections.name"), nullable=False
     )
 
     def to_dict(self):
@@ -41,5 +42,5 @@ class Tasks(db.Model):
             "task_id": self.task_id,
             "text": self.text,
             "completed": self.completed,
-            "list_name": self.list_name,
+            "collection_name": self.collection_name,
         }
