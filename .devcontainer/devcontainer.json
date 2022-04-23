@@ -22,7 +22,8 @@
     "ms-python.vscode-pylance",
     "eamodio.gitlens",
     "angular.ng-template",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "humao.rest-client"
   ],
   "remoteUser": "root",
   "remoteEnv": {
