@@ -48,7 +48,7 @@ def add_collection():
 
     task = CollectionService.add_collection(
         name=request_body["name"],
-        group_name=request_body.get("group_name", None),
+        group_id=request_body.get("group_id", None),
     )
 
     return (

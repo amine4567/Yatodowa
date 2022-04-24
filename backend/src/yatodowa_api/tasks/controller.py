@@ -20,7 +20,7 @@ def add_task():
     request_body = request.get_json()
 
     # Check for missing fields in the call
-    mandatory_fields = set(["text", "collection_name"])
+    mandatory_fields = set(["text", "collection_id"])
     try:
         missing_fields = mandatory_fields - set(request_body.keys())
         assert len(missing_fields) == 0
@@ -38,7 +38,7 @@ def add_task():
     # Try to call the add task service function
     try:
         task = TaskService.add_task(
-            text=request_body["text"], collection_name=request_body["collection_name"]
+            text=request_body["text"], collection_id=request_body["collection_id"]
         )
     except CollectionNotFoundError as e:
         return jsonify({"error_message": str(e)}), 400
