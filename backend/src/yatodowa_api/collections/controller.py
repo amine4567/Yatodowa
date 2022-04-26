@@ -1,5 +1,8 @@
+from typing import Dict
+
 import yatodowa_api.collections.service as CollectionService
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
+from yatodowa_api.common.http_utils import check_request_fields, inject_request_body
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 
 collections_api = Blueprint("collections_api", __name__)
@@ -12,24 +15,9 @@ def get_collections():
 
 
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["POST"])
-def add_collection():
-    request_body = request.get_json()
-    mandatory_fields = set(["name"])
-
-    try:
-        missing_fields = mandatory_fields - set(request_body.keys())
-        assert len(missing_fields) == 0
-    except AssertionError:
-        return (
-            jsonify(
-                {
-                    "error": "The following mandatory fields are missing: "
-                    + str(missing_fields)
-                }
-            ),
-            400,
-        )
-
+@inject_request_body
+@check_request_fields(mandatory_fields=["name"])
+def add_collection(request_body: Dict):
     existing_collections_names = [
         elt.name for elt in CollectionService.get_collections()
     ]

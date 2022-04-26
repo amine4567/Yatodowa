@@ -23,7 +23,8 @@
     "eamodio.gitlens",
     "angular.ng-template",
     "esbenp.prettier-vscode",
-    "humao.rest-client"
+    "humao.rest-client",
+    "njpwerner.autodocstring"
   ],
   "remoteUser": "root",
   "remoteEnv": {

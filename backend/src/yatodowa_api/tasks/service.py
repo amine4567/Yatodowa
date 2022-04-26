@@ -8,7 +8,7 @@ from yatodowa_api.sqldb import get_session
 from yatodowa_api.tasks.exceptions import TaskNotFoundError
 
 
-def add_task(text: str, collection_id: str) -> Task:
+def add_task(text: str, collection_id: UUID) -> Task:
     try:
         with get_session() as session:
             task = Task(text=text, collection_id=collection_id)
@@ -17,7 +17,7 @@ def add_task(text: str, collection_id: str) -> Task:
     except sqlalchemy.exc.IntegrityError:
         raise CollectionNotFoundError(
             "Foreign key violation: There is no collection with the name "
-            + collection_id
+            + str(collection_id)
         )
 
 

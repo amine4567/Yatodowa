@@ -1,8 +1,14 @@
+from typing import Dict
 from uuid import UUID
 
 import yatodowa_api.tasks.service as TaskService
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from yatodowa_api.collections.exceptions import CollectionNotFoundError
+from yatodowa_api.common.http_utils import (
+    check_request_fields,
+    inject_request_body,
+    validate_uuid_input,
+)
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.tasks.exceptions import TaskNotFoundError
 
@@ -16,26 +22,10 @@ def get_tasks():
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])
-def add_task():
-    request_body = request.get_json()
-
-    # Check for missing fields in the call
-    mandatory_fields = set(["text", "collection_id"])
-    try:
-        missing_fields = mandatory_fields - set(request_body.keys())
-        assert len(missing_fields) == 0
-    except AssertionError:
-        return (
-            jsonify(
-                {
-                    "error": "The following mandatory fields are missing: "
-                    + str(missing_fields)
-                }
-            ),
-            400,
-        )
-
-    # Try to call the add task service function
+@inject_request_body
+@check_request_fields(mandatory_fields=["text", "collection_id"])
+@validate_uuid_input("collection_id", from_request=True)
+def add_task(request_body: Dict):
     try:
         task = TaskService.add_task(
             text=request_body["text"], collection_id=request_body["collection_id"]
@@ -55,26 +45,17 @@ def add_task():
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks/<task_id>", methods=["DELETE"])
-def delete_task(task_id: str):
-    # Check is task_id is a valid UUID string
+@validate_uuid_input("task_id")
+def delete_task(task_id: UUID):
     try:
-        task_uuid = UUID(task_id)
-    except ValueError:
-        return (
-            jsonify({"error_message": f"{task_id} is not a valid hex UUID string"}),
-            400,
-        )
-
-    # Try to call the delete task service function
-    try:
-        deleted_task = TaskService.delete_task(task_uuid)
+        deleted_task = TaskService.delete_task(task_id)
     except TaskNotFoundError as e:
         return jsonify({"error_message": str(e)}), 400
     else:
         return (
             jsonify(
                 {
-                    "result": f"task with id {task_uuid} deleted successfully",
+                    "result": f"task with id {task_id} deleted successfully",
                     "description": deleted_task.to_dict(),
                 }
             ),
