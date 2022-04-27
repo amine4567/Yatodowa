@@ -1,4 +1,4 @@
-import yatodowa_api.groups.service as GroupService
+import yatodowa_api.components.groups.service as GroupService
 from flask import Blueprint, jsonify
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 

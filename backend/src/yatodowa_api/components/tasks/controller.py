@@ -1,16 +1,16 @@
 from typing import Dict
 from uuid import UUID
 
-import yatodowa_api.tasks.service as TaskService
+import yatodowa_api.components.tasks.service as TaskService
 from flask import Blueprint, jsonify
-from yatodowa_api.collections.exceptions import CollectionNotFoundError
 from yatodowa_api.common.http_utils import (
     check_request_fields,
     inject_request_body,
     validate_uuid_input,
 )
+from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
+from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.consts import COMMON_API_ENDPOINT
-from yatodowa_api.tasks.exceptions import TaskNotFoundError
 
 tasks_api = Blueprint("tasks_api", __name__)
 

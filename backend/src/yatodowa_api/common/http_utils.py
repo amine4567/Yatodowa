@@ -3,8 +3,7 @@ from typing import Callable, Dict, List
 from uuid import UUID
 
 from flask import jsonify, request
-
-REQUEST_BODY_KWARG = "request_body"
+from yatodowa_api.consts import REQUEST_BODY_KWARG
 
 
 def validate_uuid_input(input_name: str, from_request: bool = False) -> Callable:

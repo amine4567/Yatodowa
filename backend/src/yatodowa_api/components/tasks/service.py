@@ -2,10 +2,10 @@ from typing import List
 from uuid import UUID
 
 import sqlalchemy
-from yatodowa_api.collections.exceptions import CollectionNotFoundError
-from yatodowa_api.models import Task
-from yatodowa_api.sqldb import get_session
-from yatodowa_api.tasks.exceptions import TaskNotFoundError
+from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
+from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
+from yatodowa_api.sqldb.core import get_session
+from yatodowa_api.sqldb.models import Task
 
 
 def add_task(text: str, collection_id: UUID) -> Task:
@@ -16,7 +16,7 @@ def add_task(text: str, collection_id: UUID) -> Task:
             return task
     except sqlalchemy.exc.IntegrityError:
         raise CollectionNotFoundError(
-            "Foreign key violation: There is no collection with the name "
+            "Foreign key violation: There is no collection with the id "
             + str(collection_id)
         )
 

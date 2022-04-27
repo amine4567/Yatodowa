@@ -2,8 +2,7 @@ import uuid
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
-
-from yatodowa_api.sqldb import get_db
+from yatodowa_api.sqldb.core import get_db
 
 db: SQLAlchemy = get_db()
 

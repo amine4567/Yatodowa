@@ -1,6 +1,6 @@
 from typing import Dict
 
-import yatodowa_api.collections.service as CollectionService
+import yatodowa_api.components.collections.service as CollectionService
 from flask import Blueprint, jsonify
 from yatodowa_api.common.http_utils import check_request_fields, inject_request_body
 from yatodowa_api.consts import COMMON_API_ENDPOINT
