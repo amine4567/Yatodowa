@@ -2,6 +2,7 @@ from functools import wraps
 from typing import Callable, Dict, List
 from uuid import UUID
 
+import pydantic
 from flask import jsonify, request
 from yatodowa_api.consts import REQUEST_BODY_KWARG
 
@@ -85,3 +86,33 @@ def get_request_body(func_kwargs: Dict) -> Dict:
         )
     else:
         return request_body
+
+
+def validate_request(decorated_f: Callable) -> Callable:
+    @wraps(decorated_f)
+    def modified_f(*args, **kwargs):
+        try:
+            RequestSchema = decorated_f.__annotations__[REQUEST_BODY_KWARG]
+            assert issubclass(RequestSchema, pydantic.BaseModel)
+        except KeyError:
+            raise KeyError(
+                f"The '{REQUEST_BODY_KWARG}' kwarg not found in {decorated_f}'s "
+                "annotations. Please make sure the kwarg exists with the correct type "
+                "hint."
+            )
+        except AssertionError:
+            raise TypeError(
+                f"The '{REQUEST_BODY_KWARG}' kwarg expected to be of type "
+                f"{pydantic.BaseModel} but got {RequestSchema}."
+            )
+
+        try:
+            request_body = RequestSchema(**request.get_json())
+        except pydantic.ValidationError as e:
+            return jsonify({"validation_error": e.errors()}), 400
+
+        new_kwargs = {**kwargs, REQUEST_BODY_KWARG: request_body}
+        return decorated_f(*args, **new_kwargs)
+
+    return modified_f
+    

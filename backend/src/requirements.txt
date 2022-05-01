@@ -33,11 +33,15 @@ markupsafe==2.1.0
     #   mako
 psycopg2==2.9.3
     # via -r backend/src/requirements.in
+pydantic==1.9.0
+    # via -r backend/src/requirements.in
 pyyaml==6.0
     # via -r backend/src/requirements.in
 sqlalchemy==1.4.32
     # via
     #   alembic
     #   flask-sqlalchemy
+typing-extensions==4.2.0
+    # via pydantic
 werkzeug==2.0.3
     # via flask

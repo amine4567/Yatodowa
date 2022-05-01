@@ -1,16 +1,13 @@
-from typing import Dict
 from uuid import UUID
 
 import yatodowa_api.components.tasks.service as TaskService
 from flask import Blueprint, jsonify
-from yatodowa_api.common.http_utils import (
-    check_request_fields,
-    inject_request_body,
-    validate_uuid_input,
-)
+from yatodowa_api.common.http_utils import validate_request, validate_uuid_input
 from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
 from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.consts import COMMON_API_ENDPOINT
+
+from .schemas import TaskQuery, TaskResponse
 
 tasks_api = Blueprint("tasks_api", __name__)
 
@@ -22,14 +19,10 @@ def get_tasks():
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])
-@inject_request_body
-@check_request_fields(mandatory_fields=["text", "collection_id"])
-@validate_uuid_input("collection_id", from_request=True)
-def add_task(request_body: Dict):
+@validate_request
+def add_task(request_body: TaskQuery) -> TaskResponse:
     try:
-        task = TaskService.add_task(
-            text=request_body["text"], collection_id=request_body["collection_id"]
-        )
+        task = TaskService.add_task(request_body)
     except CollectionNotFoundError as e:
         return jsonify({"error_message": str(e)}), 400
     else:
