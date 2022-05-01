@@ -88,7 +88,7 @@ def get_request_body(func_kwargs: Dict) -> Dict:
         return request_body
 
 
-def validate_request(decorated_f: Callable) -> Callable:
+def validate_request_body(decorated_f: Callable) -> Callable:
     @wraps(decorated_f)
     def modified_f(*args, **kwargs):
         try:
@@ -115,4 +115,17 @@ def validate_request(decorated_f: Callable) -> Callable:
         return decorated_f(*args, **new_kwargs)
 
     return modified_f
-    
+
+
+def validate_url_vars(decorated_f: Callable) -> Callable:
+    @wraps(decorated_f)
+    def modified_f(*args, **kwargs):
+        try:
+            validated_f = pydantic.validate_arguments(decorated_f)
+            validated_f.validate(*args, **kwargs)
+        except pydantic.ValidationError as e:
+            return jsonify({"validation_error": e.errors()}), 400
+
+        return validated_f(*args, **kwargs)
+
+    return modified_f

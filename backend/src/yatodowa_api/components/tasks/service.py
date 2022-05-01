@@ -7,17 +7,19 @@ from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.sqldb.core import get_session
 from yatodowa_api.sqldb.models import TaskTable
 
-from .schemas import TaskQuery
+from .schemas import TaskQuery, TaskResponse
 
 
-def add_task(task_query: TaskQuery) -> TaskTable:
+def add_task(task_query: TaskQuery) -> TaskResponse:
     try:
         with get_session() as session:
             task = TaskTable(
                 text=task_query.text, collection_id=task_query.collection_id
             )
             session.add(task)
-            return task
+
+        task_response = TaskResponse(**task.to_dict())
+        return task_response
     except sqlalchemy.exc.IntegrityError:
         raise CollectionNotFoundError(
             "Foreign key violation: There is no collection with the id "
@@ -25,13 +27,15 @@ def add_task(task_query: TaskQuery) -> TaskTable:
         )
 
 
-def get_tasks() -> List[TaskTable]:
+def get_tasks() -> List[TaskResponse]:
     with get_session():
         tasks = TaskTable.query.all()
-        return tasks
+
+    tasks_response = [TaskResponse(**task.to_dict()) for task in tasks]
+    return tasks_response
 
 
-def delete_task(task_id: UUID) -> TaskTable:
+def delete_task(task_id: UUID) -> TaskResponse:
     with get_session():
         query = TaskTable.query.filter(TaskTable.task_id == task_id)
 
@@ -43,6 +47,6 @@ def delete_task(task_id: UUID) -> TaskTable:
             )
 
         delete_results = query.delete()
-        assert delete_results == 1
+        assert delete_results == 1  # TODO
 
-        return query_results[0]
+    return TaskResponse(**query_results[0].to_dict())
