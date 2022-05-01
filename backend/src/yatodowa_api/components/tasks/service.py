@@ -5,15 +5,17 @@ import sqlalchemy
 from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
 from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.sqldb.core import get_session
-from yatodowa_api.sqldb.models import Task
+from yatodowa_api.sqldb.models import TaskTable
 
 from .schemas import TaskQuery
 
 
-def add_task(task_query: TaskQuery) -> Task:
+def add_task(task_query: TaskQuery) -> TaskTable:
     try:
         with get_session() as session:
-            task = Task(text=task_query.text, collection_id=task_query.collection_id)
+            task = TaskTable(
+                text=task_query.text, collection_id=task_query.collection_id
+            )
             session.add(task)
             return task
     except sqlalchemy.exc.IntegrityError:
@@ -23,15 +25,15 @@ def add_task(task_query: TaskQuery) -> Task:
         )
 
 
-def get_tasks() -> List[Task]:
+def get_tasks() -> List[TaskTable]:
     with get_session():
-        tasks = Task.query.all()
+        tasks = TaskTable.query.all()
         return tasks
 
 
-def delete_task(task_id: UUID) -> Task:
+def delete_task(task_id: UUID) -> TaskTable:
     with get_session():
-        query = Task.query.filter(Task.task_id == task_id)
+        query = TaskTable.query.filter(TaskTable.task_id == task_id)
 
         query_results = query.all()
         if len(query_results) == 0:
