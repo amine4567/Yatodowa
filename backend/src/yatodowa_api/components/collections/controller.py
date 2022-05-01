@@ -1,9 +1,9 @@
-from typing import Dict
-
 import yatodowa_api.components.collections.service as CollectionService
 from flask import Blueprint, jsonify
-from yatodowa_api.common.http_utils import check_request_fields, inject_request_body
+from yatodowa_api.common.http_utils import validate_request_body
 from yatodowa_api.consts import COMMON_API_ENDPOINT
+
+from .schemas import CollectionQueryBody
 
 collections_api = Blueprint("collections_api", __name__)
 
@@ -15,28 +15,27 @@ def get_collections():
 
 
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["POST"])
-@inject_request_body
-@check_request_fields(mandatory_fields=["name"])
-def add_collection(request_body: Dict):
+@validate_request_body
+def add_collection(request_body: CollectionQueryBody):
     existing_collections_names = [
         elt.name for elt in CollectionService.get_collections()
     ]
     try:
-        assert request_body["name"] not in existing_collections_names
+        assert request_body.name not in existing_collections_names
     except AssertionError:
         return (
             jsonify(
                 {
                     "error": "There already exist a collection with the name "
-                    + request_body["name"]
+                    + request_body.name
                 }
             ),
             400,
         )
 
     task = CollectionService.add_collection(
-        name=request_body["name"],
-        group_id=request_body.get("group_id", None),
+        name=request_body.name,
+        group_id=request_body.group_id,
     )
 
     return (

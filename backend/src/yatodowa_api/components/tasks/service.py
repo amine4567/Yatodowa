@@ -7,10 +7,10 @@ from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.sqldb.core import get_session
 from yatodowa_api.sqldb.models import TaskTable
 
-from .schemas import TaskQuery, TaskResponse
+from .schemas import TaskQueryBody, TaskResponse
 
 
-def add_task(task_query: TaskQuery) -> TaskResponse:
+def add_task(task_query: TaskQueryBody) -> TaskResponse:
     try:
         with get_session() as session:
             task = TaskTable(
