@@ -1,9 +1,9 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from yatodowa_api.common.schemas import CustomBaseModel
 
 
-class CollectionQueryBody(BaseModel):
+class CollectionQueryBody(CustomBaseModel):
     name: str
     group_id: Optional[UUID]
