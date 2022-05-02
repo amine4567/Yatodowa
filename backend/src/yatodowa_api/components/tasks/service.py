@@ -49,4 +49,4 @@ def delete_task(task_id: UUID) -> TaskResponse:
         delete_results = query.delete()
         assert delete_results == 1  # TODO
 
-    return TaskResponse(**query_results[0].to_dict())
+        return TaskResponse(**query_results[0].to_dict())
