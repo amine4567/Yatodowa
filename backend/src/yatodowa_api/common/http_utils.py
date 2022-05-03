@@ -42,13 +42,19 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
                 "variables."
             )
 
-        missing_url_vars = declared_url_vars - (
-            set(inspect.signature(decorated_f).parameters.keys()) - set(RESERVED_KWARGS)
-        )
-        if len(missing_url_vars) != 0:
+        non_reserved_params = set(
+            inspect.signature(decorated_f).parameters.keys()
+        ) - set(RESERVED_KWARGS)
+        if len(declared_url_vars - non_reserved_params) != 0:
             raise KeyError(
-                f"{missing_url_vars} are declared as URL variables but are missing in "
-                "the function's parameters"
+                f"{declared_url_vars - non_reserved_params} are declared as URL "
+                "variables but are missing in the function's parameters."
+            )
+
+        if len(non_reserved_params - declared_url_vars) != 0:
+            raise KeyError(
+                f"{non_reserved_params - declared_url_vars} are declared in the "
+                "function's parameters but are not declared as URL variables."
             )
 
         annotated_params = {
@@ -146,8 +152,6 @@ class ValidatedBlueprint(Blueprint):
 
             modified_f = decorated_f
 
-            modified_f = validate_url_vars(modified_f)
-
             if REQUEST_ARGS_KWARG in f_params:
                 # TODO: what if arguments are passed when they are not expected ?
                 modified_f = validate_request_args(modified_f)
@@ -155,6 +159,8 @@ class ValidatedBlueprint(Blueprint):
             if REQUEST_BODY_KWARG in f_params:
                 # TODO: what if a request body is given even though it's not expected ?
                 modified_f = validate_request_body(modified_f)
+
+            modified_f = validate_url_vars(modified_f)
 
             modified_f = serialize_response(modified_f)
 
