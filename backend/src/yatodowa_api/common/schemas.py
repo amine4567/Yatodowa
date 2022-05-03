@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Extra
 
 
-class CustomBaseModel(BaseModel):
+class StrictBaseModel(BaseModel):
     class Config:
         extra = Extra.forbid
 
@@ -14,7 +14,7 @@ class ErrorType(str, Enum):
     VALIDATION = "validation_error"
 
 
-class APICallError(CustomBaseModel):
+class APICallError(StrictBaseModel):
     type: ErrorType
     subtype: Optional[str]
     message: str

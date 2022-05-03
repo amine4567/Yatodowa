@@ -1,21 +1,21 @@
 from typing import Optional
 from uuid import UUID
 
-from yatodowa_api.common.schemas import CustomBaseModel
+from yatodowa_api.common.schemas import StrictBaseModel
 
 
-class TaskQueryBody(CustomBaseModel):
+class TaskQueryBody(StrictBaseModel):
     text: str
     collection_id: UUID
 
 
-class TaskQueryArgs(CustomBaseModel):
+class TaskQueryArgs(StrictBaseModel):
     pagination: Optional[int]
     skip: Optional[int]
     collection_id: Optional[UUID]
 
 
-class TaskResponse(CustomBaseModel):
+class TaskResponse(StrictBaseModel):
     task_id: UUID
     text: str
     completed: bool

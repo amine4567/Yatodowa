@@ -4,8 +4,8 @@ from typing import Callable
 
 import pydantic
 from flask import Blueprint, jsonify, request
-from yatodowa_api.common.schemas import APICallError, CustomBaseModel, ErrorType
-from yatodowa_api.consts import REQUEST_ARGS_KWARG, REQUEST_BODY_KWARG, RESERVED_KWARGS
+from yatodowa_api.common.schemas import APICallError, ErrorType, StrictBaseModel
+from yatodowa_api.consts import REQUEST_ARGS_KWARG, REQUEST_BODY_PARAM, RESERVED_KWARGS
 
 
 def serialize_response(decorated_f: Callable) -> Callable:
@@ -48,17 +48,17 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
         if len(declared_url_vars - non_reserved_params) != 0:
             raise KeyError(
                 f"{declared_url_vars - non_reserved_params} are declared as URL "
-                "variables but are missing in the function's parameters."
+                f"variables but are missing in {decorated_f}'s parameters."
             )
 
         if len(non_reserved_params - declared_url_vars) != 0:
             raise KeyError(
                 f"{non_reserved_params - declared_url_vars} are declared in the "
-                "function's parameters but are not declared as URL variables."
+                f"{decorated_f}'s parameters but are not declared as URL variables."
             )
 
         annotated_params = {
-            k: (v, ...)  # TODO: what if the function's parameters have default values ?
+            k: (v, ...)
             for k, v in decorated_f.__annotations__.items()
             if k not in RESERVED_KWARGS
         }
@@ -66,19 +66,18 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
         if len(missing_annotations) != 0:
             raise KeyError(
                 f"{missing_annotations} are declared as URL variables, exist in the "
-                "function's parameters but are missing annotations. Please add type "
-                "hints to these parameters."
+                f"{decorated_f}'s parameters but are missing annotations. Please add "
+                "type hints to these parameters."
             )
 
         try:
             UrlVarsModel = pydantic.create_model(
-                "UrlVarsModel", __base__=CustomBaseModel, **annotated_params
+                "UrlVarsModel", __base__=StrictBaseModel, **annotated_params
             )
             url_vars_values = request.view_args
 
             validated_values = UrlVarsModel(**url_vars_values)
         except pydantic.ValidationError as e:
-            print(e.errors())
             return (
                 [
                     APICallError(
@@ -97,41 +96,58 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
     return modified_f
 
 
-def validate_request_vals(kwarg_name: str, request_vals_getter: Callable) -> Callable:
+def validate_request_vals(
+    param_name: str, request_vals_getter: Callable[[], dict]
+) -> Callable:
     def decorator(decorated_f: Callable) -> Callable:
         @wraps(decorated_f)
         def modified_f(*args, **kwargs):
-            try:
-                Schema = decorated_f.__annotations__[kwarg_name]
-            except KeyError:
-                raise KeyError(
-                    f"The '{kwarg_name}' kwarg not found in {decorated_f}'s "
-                    "annotations. Please make sure the kwarg exists with the correct "
-                    "type hint."
-                )
+            if param_name in inspect.signature(decorated_f).parameters:
+                try:
+                    Schema = decorated_f.__annotations__[param_name]
+                except KeyError:
+                    raise KeyError(
+                        f"The '{param_name}' parameter not found in {decorated_f}'s "
+                        "annotations. Please add a type hint. "
+                    )
 
-            if not issubclass(Schema, pydantic.BaseModel):
-                raise TypeError(
-                    f"The '{kwarg_name}' kwarg expected to be of type "
-                    f"{pydantic.BaseModel} but got {Schema}."
-                )
+                if not issubclass(Schema, pydantic.BaseModel):
+                    raise TypeError(
+                        f"The '{param_name}' parameter expected to be of type "
+                        f"{pydantic.BaseModel} but got {Schema}."
+                    )
 
-            try:
-                request_args = Schema(**request_vals_getter())
-            except pydantic.ValidationError as e:
-                return (
-                    [
+                try:
+                    request_vals = Schema(**request_vals_getter())
+                except pydantic.ValidationError as e:
+                    return (
+                        [
+                            APICallError(
+                                type=ErrorType.VALIDATION,
+                                subtype=error["type"],
+                                message=".".join(error["loc"]) + ": " + error["msg"],
+                            )
+                            for error in e.errors()
+                        ],
+                        400,
+                    )
+
+                new_kwargs = {**kwargs, param_name: request_vals}
+            else:
+                try:
+                    StrictBaseModel(**request_vals_getter())
+                except pydantic.ValidationError:
+                    return (
                         APICallError(
                             type=ErrorType.VALIDATION,
-                            subtype=error["type"],
-                            message=".".join(error["loc"]) + ": " + error["msg"],
-                        )
-                        for error in e.errors()
-                    ],
-                    400,
-                )
+                            message=f"{param_name} is expected to be empty but got "
+                            + str(request_vals_getter()),
+                        ),
+                        400,
+                    )
 
-            new_kwargs = {**kwargs, kwarg_name: request_args}
+                new_kwargs = kwargs
+
             return decorated_f(*args, **new_kwargs)
 
         return modified_f
@@ -140,25 +156,21 @@ def validate_request_vals(kwarg_name: str, request_vals_getter: Callable) -> Cal
 
 
 validate_request_body = validate_request_vals(
-    REQUEST_BODY_KWARG, lambda: request.get_json()
+    REQUEST_BODY_PARAM, lambda: request.get_json() or dict()
 )
-validate_request_args = validate_request_vals(REQUEST_ARGS_KWARG, lambda: request.args)
+validate_request_args = validate_request_vals(
+    REQUEST_ARGS_KWARG, lambda: dict(request.args)
+)
 
 
 class ValidatedBlueprint(Blueprint):
     def route(self, *args, **kwargs):
         def decorator(decorated_f: Callable) -> Callable:
-            f_params = inspect.signature(decorated_f).parameters
-
             modified_f = decorated_f
 
-            if REQUEST_ARGS_KWARG in f_params:
-                # TODO: what if arguments are passed when they are not expected ?
-                modified_f = validate_request_args(modified_f)
+            modified_f = validate_request_args(modified_f)
 
-            if REQUEST_BODY_KWARG in f_params:
-                # TODO: what if a request body is given even though it's not expected ?
-                modified_f = validate_request_body(modified_f)
+            modified_f = validate_request_body(modified_f)
 
             modified_f = validate_url_vars(modified_f)
 

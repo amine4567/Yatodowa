@@ -1,9 +1,9 @@
 from typing import Optional
 from uuid import UUID
 
-from yatodowa_api.common.schemas import CustomBaseModel
+from yatodowa_api.common.schemas import StrictBaseModel
 
 
-class CollectionQueryBody(CustomBaseModel):
+class CollectionQueryBody(StrictBaseModel):
     name: str
     group_id: Optional[UUID]
