@@ -4,13 +4,15 @@ from typing import Callable
 
 import pydantic
 from flask import Blueprint, jsonify, request
-from yatodowa_api.common.schemas import APICallError, ErrorType, StrictBaseModel
 from yatodowa_api.consts import REQUEST_ARGS_KWARG, REQUEST_BODY_PARAM, RESERVED_KWARGS
+
+from .misc import chain_decorators
+from .schemas import APICallError, ErrorType, StrictBaseModel
 
 
 def serialize_response(decorated_f: Callable) -> Callable:
     @wraps(decorated_f)
-    def modified_f(*args, **kwargs):
+    def tranformed_f(*args, **kwargs):
         response, response_code = decorated_f(*args, **kwargs)
         # TODO: assert on reponse type
         if isinstance(response, list):
@@ -18,22 +20,12 @@ def serialize_response(decorated_f: Callable) -> Callable:
         else:
             return jsonify(response.dict()), response_code
 
-    return modified_f
+    return tranformed_f
 
 
 def validate_url_vars(decorated_f: Callable) -> Callable:
-    """decorator to validate an URL variable as defined by flask using pydantic
-    Example: http://127.0.0.1:5000/api/v1/tasks/408bce1f-f36e-4d39-9d69-614071572d84
-
-    Args:
-        decorated_f (Callable): _description_
-
-    Returns:
-        Callable: _description_
-    """
-
     @wraps(decorated_f)
-    def modified_f(*args, **kwargs):
+    def transformed_f(*args, **kwargs):
         declared_url_vars = request.url_rule.arguments
         illegal_url_vars = declared_url_vars.intersection(RESERVED_KWARGS)
         if len(illegal_url_vars) != 0:
@@ -93,7 +85,7 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
         new_kwargs = {**kwargs, **validated_values.dict()}
         return decorated_f(*args, **new_kwargs)
 
-    return modified_f
+    return transformed_f
 
 
 def validate_request_vals(
@@ -101,7 +93,7 @@ def validate_request_vals(
 ) -> Callable:
     def decorator(decorated_f: Callable) -> Callable:
         @wraps(decorated_f)
-        def modified_f(*args, **kwargs):
+        def transformed_f(*args, **kwargs):
             if param_name in inspect.signature(decorated_f).parameters:
                 try:
                     Schema = decorated_f.__annotations__[param_name]
@@ -150,7 +142,7 @@ def validate_request_vals(
 
             return decorated_f(*args, **new_kwargs)
 
-        return modified_f
+        return transformed_f
 
     return decorator
 
@@ -166,18 +158,16 @@ validate_request_args = validate_request_vals(
 class ValidatedBlueprint(Blueprint):
     def route(self, *args, **kwargs):
         def decorator(decorated_f: Callable) -> Callable:
-            modified_f = decorated_f
-
-            modified_f = validate_request_args(modified_f)
-
-            modified_f = validate_request_body(modified_f)
-
-            modified_f = validate_url_vars(modified_f)
-
-            modified_f = serialize_response(modified_f)
-
-            modified_f = super(Blueprint, self).route(*args, **kwargs)(modified_f)
-
-            return modified_f
+            transformed_f = chain_decorators(
+                (
+                    validate_request_args,
+                    validate_request_body,
+                    validate_url_vars,
+                    serialize_response,
+                    super(Blueprint, self).route(*args, **kwargs),
+                ),
+                func=decorated_f,
+            )
+            return transformed_f
 
         return decorator
