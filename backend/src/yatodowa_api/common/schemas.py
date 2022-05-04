@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Extra
 
@@ -16,5 +15,5 @@ class ErrorType(str, Enum):
 
 class APICallError(StrictBaseModel):
     type: ErrorType
-    subtype: Optional[str]
+    subtype: str | None
     message: str

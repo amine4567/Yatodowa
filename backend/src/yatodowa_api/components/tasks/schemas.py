@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from yatodowa_api.common.schemas import StrictBaseModel
@@ -10,9 +9,9 @@ class TaskQueryBody(StrictBaseModel):
 
 
 class TaskQueryArgs(StrictBaseModel):
-    pagination: Optional[int]
-    skip: Optional[int]
-    collection_id: Optional[UUID]
+    pagination: int | None
+    skip: int | None
+    collection_id: UUID | None
 
 
 class TaskResponse(StrictBaseModel):

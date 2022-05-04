@@ -1,4 +1,3 @@
-from typing import List
 from uuid import UUID
 
 import sqlalchemy
@@ -27,7 +26,7 @@ def add_task(task_query: TaskQueryBody) -> TaskResponse:
         )
 
 
-def get_tasks() -> List[TaskResponse]:
+def get_tasks() -> list[TaskResponse]:
     with get_session():
         tasks = TaskTable.query.all()
 
