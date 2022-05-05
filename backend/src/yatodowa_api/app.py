@@ -15,7 +15,9 @@ from yatodowa_api.sqldb.core import get_db
 
 def create_app(custom_config_dirpath: str | None = None) -> Flask:
     app = Flask(__name__)
-    CORS(app)
+    CORS(
+        app
+    )  # TODO: implement my own way to handle CORS. by taking insipiration from flask-cors and FastAPI middleware: https://fastapi.tiangolo.com/tutorial/cors/
 
     app_config_dirpath = Path(
         custom_config_dirpath
