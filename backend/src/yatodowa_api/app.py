@@ -3,16 +3,19 @@ from pathlib import Path
 
 import yaml
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 
 from yatodowa_api.components.collections.controller import collections_api
 from yatodowa_api.components.groups.controller import groups_api
 from yatodowa_api.components.tasks.controller import tasks_api
+from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.sqldb.core import get_db
 
 
 def create_app(custom_config_dirpath: str | None = None) -> Flask:
     app = Flask(__name__)
+    CORS(app)
 
     app_config_dirpath = Path(
         custom_config_dirpath
