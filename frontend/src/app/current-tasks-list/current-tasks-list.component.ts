@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 export class CurrentTasksListComponent implements OnInit {
   tasks: Array<string> = [];
   newTaskVal: string = '';
-  tasksUrl: string = 'http://127.0.0.1:5000/api/v1/tasks';
+  tasksUrl: string = 'http://127.0.0.1:4200/api/v1/tasks';
 
   constructor(private http: HttpClient) {}
 
