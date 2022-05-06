@@ -28,7 +28,7 @@ def run_front(c):
 
 @task
 def run(c):
-    run_back(c)
+    c.run("invoke run-back & invoke run-front")
 
 
 # Flask-migrate
