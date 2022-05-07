@@ -45,3 +45,14 @@ def db_migrate(c, message):
 @task
 def db_upgrade(c):
     c.run("cd backend/src/yatodowa_api; flask db upgrade")
+
+
+# sphinx docs
+@task
+def build_docs(c):
+    c.run("cd docs; make html")
+
+
+@task
+def serve_docs(c):
+    c.run("python3 -m http.server -d docs/_build/html 9999")
