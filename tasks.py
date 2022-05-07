@@ -11,7 +11,7 @@ def update_app_reqs(c):
 @task
 def update_combined_reqs(c):
     c.run(
-        "pip-compile backend/src/requirements.in backend/requirements-dev.in -o backend/requirements-combined.txt"
+        "pip-compile backend/src/requirements.in backend/requirements-dev.in docs/requirements-docs.in -o backend/requirements-combined.txt"
     )
 
 
@@ -56,3 +56,8 @@ def build_docs(c):
 @task
 def serve_docs(c):
     c.run("python3 -m http.server -d docs/_build/html 9999")
+
+
+@task
+def update_doc_reqs(c):
+    c.run("pip-compile docs/requirements-docs.in")
