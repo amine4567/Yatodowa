@@ -6,6 +6,12 @@ import pydantic
 from flask import Blueprint, jsonify, request
 from yatodowa_api.consts import REQUEST_ARGS_KWARG, REQUEST_BODY_PARAM, RESERVED_KWARGS
 
+from .exceptions import (
+    MissingParametersError,
+    MissingTypeHintsError,
+    MissingURLVariableError,
+    ReservedKeywordsError,
+)
 from .misc import chain_decorators
 from .schemas import APICallError, ErrorType, StrictBaseModel
 
@@ -24,12 +30,34 @@ def serialize_response(decorated_f: Callable) -> Callable:
 
 
 def validate_url_vars(decorated_f: Callable) -> Callable:
+    """Decorator to apply on flask view functions to validate URL variables. Every
+    parameter that is not a reserved keyword is considered an URL variable, there must
+    be a one-to-one correspondence between the declared URL variables and the declared
+    view function parameters. Each parameter must be type hinted.
+
+    Args:
+        decorated_f (Callable): Decorated function
+
+    Raises:
+        ReservedKeywordsError:
+            if reserved keywords are used a as URL variables
+        MissingParametersError:
+            if declared URL variables are missing from the function's parameters
+        MissingURLVariableError:
+            if a declared function parameter doesn't have a corresponding URL variable
+        MissingTypeHintsError:
+            if a parameter is missing a type hint
+
+    Returns:
+        Callable: Transformed function
+    """
+
     @wraps(decorated_f)
     def transformed_f(*args, **kwargs):
         declared_url_vars = request.url_rule.arguments
         illegal_url_vars = declared_url_vars.intersection(RESERVED_KWARGS)
         if len(illegal_url_vars) != 0:
-            raise KeyError(
+            raise ReservedKeywordsError(
                 f"{illegal_url_vars} are reserved keywords and cannot be used as URL "
                 "variables."
             )
@@ -38,13 +66,13 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
             inspect.signature(decorated_f).parameters.keys()
         ) - set(RESERVED_KWARGS)
         if len(declared_url_vars - non_reserved_params) != 0:
-            raise KeyError(
+            raise MissingParametersError(
                 f"{declared_url_vars - non_reserved_params} are declared as URL "
                 f"variables but are missing in {decorated_f}'s parameters."
             )
 
         if len(non_reserved_params - declared_url_vars) != 0:
-            raise KeyError(
+            raise MissingURLVariableError(
                 f"{non_reserved_params - declared_url_vars} are declared in the "
                 f"{decorated_f}'s parameters but are not declared as URL variables."
             )
@@ -56,7 +84,7 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
         }
         missing_annotations = declared_url_vars - set(annotated_params.keys())
         if len(missing_annotations) != 0:
-            raise KeyError(
+            raise MissingTypeHintsError(
                 f"{missing_annotations} are declared as URL variables, exist in the "
                 f"{decorated_f}'s parameters but are missing annotations. Please add "
                 "type hints to these parameters."

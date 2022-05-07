@@ -3,7 +3,7 @@ from typing import Callable
 
 
 def chain_decorators(decorators: tuple[Callable], func: Callable) -> Callable:
-    """Apply decorators on function from left to right
+    """Apply decorators on a function from left to right
 
     Args:
         decorators (tuple[Callable]): The leftmost decorator is applied first
