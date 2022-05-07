@@ -35,21 +35,26 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
     be a one-to-one correspondence between the declared URL variables and the declared
     view function parameters. Each parameter must be type hinted.
 
-    Args:
-        decorated_f (Callable): Decorated function
+    Parameters
+    ----------
+    decorated_f : Callable
+        Decorated function
 
-    Raises:
-        ReservedKeywordsError:
-            if reserved keywords are used a as URL variables
-        MissingParametersError:
-            if declared URL variables are missing from the function's parameters
-        MissingURLVariableError:
-            if a declared function parameter doesn't have a corresponding URL variable
-        MissingTypeHintsError:
-            if a parameter is missing a type hint
+    Returns
+    -------
+    Callable
+        Transformed function
 
-    Returns:
-        Callable: Transformed function
+    Raises
+    ------
+    ReservedKeywordsError
+        if reserved keywords are used as URL variables
+    MissingParametersError
+        if declared URL variables are missing from the function's parameters
+    MissingURLVariableError
+        if a declared function parameter doesn't have a corresponding URL variable
+    MissingTypeHintsError
+        if a parameter is missing a type hint
     """
 
     @wraps(decorated_f)
