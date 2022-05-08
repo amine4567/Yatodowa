@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from flask import Flask
@@ -12,7 +11,7 @@ from yatodowa_api.components.tasks.controller import tasks_api
 from yatodowa_api.sqldb.core import get_db
 
 
-def create_app(custom_config_dirpath: Optional[str] = None) -> Flask:
+def create_app(custom_config_dirpath: str | None = None) -> Flask:
     app = Flask(__name__)
 
     app_config_dirpath = Path(
@@ -25,7 +24,7 @@ def create_app(custom_config_dirpath: Optional[str] = None) -> Flask:
 
     db = get_db()
     db.init_app(app)
-    migrate = Migrate(
+    Migrate(
         app,
         db,
         directory=Path(os.path.realpath(__file__)).parent / "sqldb" / "migrations",

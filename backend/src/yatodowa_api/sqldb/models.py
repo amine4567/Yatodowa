@@ -7,13 +7,13 @@ from yatodowa_api.sqldb.core import get_db
 db: SQLAlchemy = get_db()
 
 
-class Group(db.Model):
+class GroupTable(db.Model):
     __tablename__ = "groups"
     group_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column(db.String(20), unique=True)
 
 
-class Collection(db.Model):
+class CollectionTable(db.Model):
     __tablename__ = "collections"
     collection_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column(db.String(20), unique=True)
@@ -29,7 +29,7 @@ class Collection(db.Model):
         }
 
 
-class Task(db.Model):
+class TaskTable(db.Model):
     __tablename__ = "tasks"
     task_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     text = db.Column(db.String(200))
