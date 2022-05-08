@@ -1,35 +1,42 @@
-from typing import List
 from uuid import UUID
 
 import sqlalchemy
 from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
 from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.sqldb.core import get_session
-from yatodowa_api.sqldb.models import Task
+from yatodowa_api.sqldb.models import TaskTable
+
+from .schemas import TaskQueryBody, TaskResponse
 
 
-def add_task(text: str, collection_id: UUID) -> Task:
+def add_task(task_query: TaskQueryBody) -> TaskResponse:
     try:
         with get_session() as session:
-            task = Task(text=text, collection_id=collection_id)
+            task = TaskTable(
+                text=task_query.text, collection_id=task_query.collection_id
+            )
             session.add(task)
-            return task
+
+        task_response = TaskResponse(**task.to_dict())
+        return task_response
     except sqlalchemy.exc.IntegrityError:
         raise CollectionNotFoundError(
             "Foreign key violation: There is no collection with the id "
-            + str(collection_id)
+            + str(task_query.collection_id)
         )
 
 
-def get_tasks() -> List[Task]:
+def get_tasks() -> list[TaskResponse]:
     with get_session():
-        tasks = Task.query.all()
-        return tasks
+        tasks = TaskTable.query.all()
+
+    tasks_response = [TaskResponse(**task.to_dict()) for task in tasks]
+    return tasks_response
 
 
-def delete_task(task_id: UUID) -> Task:
+def delete_task(task_id: UUID) -> TaskResponse:
     with get_session():
-        query = Task.query.filter(Task.task_id == task_id)
+        query = TaskTable.query.filter(TaskTable.task_id == task_id)
 
         query_results = query.all()
         if len(query_results) == 0:
@@ -39,6 +46,6 @@ def delete_task(task_id: UUID) -> Task:
             )
 
         delete_results = query.delete()
-        assert delete_results == 1
+        assert delete_results == 1  # TODO
 
-        return query_results[0]
+        return TaskResponse(**query_results[0].to_dict())
