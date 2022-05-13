@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from pydantic import validator
-from yatodowa_api.api_validation import StrictBaseModel
+from yatodowa_api.api_validation import StrictBaseModel, validators
 
 
 class TaskQueryBody(StrictBaseModel):
@@ -26,6 +25,4 @@ class TasksResponse(StrictBaseModel):
     tasks: list[TaskResponse]
     count: int | None
 
-    @validator("count", always=True)
-    def compute_count(cls, _, values: dict) -> int:
-        return len(values["tasks"])
+    _count_validator: classmethod = validators.count_validator("tasks", "count")

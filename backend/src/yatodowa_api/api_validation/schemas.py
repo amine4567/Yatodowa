@@ -1,6 +1,7 @@
 from enum import Enum
 
-from pydantic import BaseModel, Extra, validator
+from pydantic import BaseModel, Extra
+from yatodowa_api.api_validation import validators
 
 
 class StrictBaseModel(BaseModel):
@@ -23,6 +24,4 @@ class APICallErrors(StrictBaseModel):
     errors: list[APICallError]
     errors_count: int | None
 
-    @validator("errors_count", always=True)
-    def compute_count(cls, _, values: dict) -> int:
-        return len(values["errors"])
+    _count_validator: classmethod = validators("errors", "errors_count")

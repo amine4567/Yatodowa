@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from pydantic import validator
-from yatodowa_api.api_validation import StrictBaseModel
+from yatodowa_api.api_validation import StrictBaseModel, validators
 
 
 class CollectionQueryBody(StrictBaseModel):
@@ -19,6 +18,4 @@ class CollectionsResponse(StrictBaseModel):
     collections: list[CollectionResponse]
     count: int | None
 
-    @validator("count", always=True)
-    def compute_count(cls, _, values: dict) -> int:
-        return len(values["collections"])
+    _count_validator: classmethod = validators.count_validator("collections", "count")
