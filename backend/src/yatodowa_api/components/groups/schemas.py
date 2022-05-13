@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from pydantic import validator
 from yatodowa_api.api_validation import StrictBaseModel
 
 
@@ -9,5 +10,9 @@ class GroupResponse(StrictBaseModel):
 
 
 class GroupsResponse(StrictBaseModel):
-    count: int
     groups: list[GroupResponse]
+    count: int | None
+
+    @validator("count", always=True)
+    def compute_count(cls, _, values: dict) -> int:
+        return len(values["groups"])

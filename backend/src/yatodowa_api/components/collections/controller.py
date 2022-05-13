@@ -10,7 +10,7 @@ collections_api = ValidatedBlueprint("collections_api", __name__)
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["GET"])
 def get_collections():
     collections = CollectionService.get_collections()
-    return CollectionsResponse(count=len(collections), collections=collections), 200
+    return CollectionsResponse(collections=collections), 200
 
 
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["POST"])

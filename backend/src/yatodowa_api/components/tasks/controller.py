@@ -15,7 +15,7 @@ tasks_api = ValidatedBlueprint("tasks_api", __name__)
 def get_tasks(request_args: TaskQueryArgs):
     print(request_args)
     tasks_response = TaskService.get_tasks()
-    return TasksResponse(count=len(tasks_response), tasks=tasks_response), 200
+    return TasksResponse(tasks=tasks_response), 200
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])

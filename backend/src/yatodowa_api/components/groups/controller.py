@@ -10,4 +10,4 @@ groups_api = ValidatedBlueprint("groups_api", __name__)
 @groups_api.route(COMMON_API_ENDPOINT + "/groups", methods=["GET"])
 def get_groups():
     groups = GroupService.get_groups()
-    return GroupsResponse(count=len(groups), groups=groups), 200
+    return GroupsResponse(groups=groups), 200

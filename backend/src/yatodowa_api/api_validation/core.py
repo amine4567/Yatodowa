@@ -13,7 +13,7 @@ from .exceptions import (
     ReservedKeywordsError,
 )
 from .misc import chain_decorators
-from .schemas import APICallError, ErrorType, StrictBaseModel
+from .schemas import APICallError, APICallErrors, ErrorType, StrictBaseModel
 
 
 def serialize_response(decorated_f: Callable) -> Callable:
@@ -114,14 +114,16 @@ def validate_url_vars(decorated_f: Callable) -> Callable:
             validated_values = UrlVarsModel(**url_vars_values)
         except pydantic.ValidationError as e:
             return (
-                [
-                    APICallError(
-                        type=ErrorType.VALIDATION,
-                        subtype=error["type"],
-                        message=".".join(error["loc"]) + ": " + error["msg"],
-                    )
-                    for error in e.errors()
-                ],
+                APICallErrors(
+                    errors=[
+                        APICallError(
+                            type=ErrorType.VALIDATION,
+                            subtype=error["type"],
+                            message=".".join(error["loc"]) + ": " + error["msg"],
+                        )
+                        for error in e.errors()
+                    ]
+                ),
                 400,
             )
 
@@ -156,14 +158,18 @@ def validate_request_vals(
                     request_vals = Schema(**request_vals_getter())
                 except pydantic.ValidationError as e:
                     return (
-                        [
-                            APICallError(
-                                type=ErrorType.VALIDATION,
-                                subtype=error["type"],
-                                message=".".join(error["loc"]) + ": " + error["msg"],
-                            )
-                            for error in e.errors()
-                        ],
+                        APICallErrors(
+                            errors=[
+                                APICallError(
+                                    type=ErrorType.VALIDATION,
+                                    subtype=error["type"],
+                                    message=".".join(error["loc"])
+                                    + ": "
+                                    + error["msg"],
+                                )
+                                for error in e.errors()
+                            ]
+                        ),
                         400,
                     )
 
