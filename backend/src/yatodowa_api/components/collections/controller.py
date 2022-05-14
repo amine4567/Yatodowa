@@ -1,6 +1,6 @@
 import yatodowa_api.components.collections.service as CollectionService
-from yatodowa_api.api_validation import APICallError, ErrorType, ValidatedBlueprint
 from yatodowa_api.consts import COMMON_API_ENDPOINT
+from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
 from .schemas import CollectionQueryBody, CollectionsResponse
 

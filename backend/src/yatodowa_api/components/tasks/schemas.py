@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from yatodowa_api.api_validation import StrictBaseModel, validators
+from yatodowa_api.validation import StrictBaseModel, validators
 
 
 class TaskQueryBody(StrictBaseModel):

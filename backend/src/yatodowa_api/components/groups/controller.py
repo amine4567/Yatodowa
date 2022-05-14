@@ -1,6 +1,6 @@
 import yatodowa_api.components.groups.service as GroupService
-from yatodowa_api.api_validation import ValidatedBlueprint
 from yatodowa_api.consts import COMMON_API_ENDPOINT
+from yatodowa_api.validation import ValidatedBlueprint
 
 from .schemas import GroupsResponse
 
