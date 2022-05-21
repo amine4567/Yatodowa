@@ -1,8 +1,8 @@
+import logging
 from uuid import UUID
 
 import sqlalchemy
-from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
-from yatodowa_api.components.collections.service import get_collection
+from yatodowa_api.components.collections.service import check_if_collection_exists
 from yatodowa_api.sqldb.core import get_session
 from yatodowa_api.sqldb.models import TaskTable
 
@@ -14,6 +14,8 @@ from .schemas import (
     TaskRespModel,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def add_task(task_query: TaskPostQueryBodyModel) -> TaskRespModel:
     try:
@@ -23,13 +25,14 @@ def add_task(task_query: TaskPostQueryBodyModel) -> TaskRespModel:
             )
             session.add(task)
 
-        task_response = TaskRespModel(**task.to_dict())
+        task_response = TaskRespModel.from_orm(task)
         return task_response
-    except sqlalchemy.exc.IntegrityError:
-        raise CollectionNotFoundError(
-            "Foreign key violation: There is no collection with the id "
-            + str(task_query.collection_id)
-        )
+    except sqlalchemy.exc.IntegrityError as integrity_error:
+        check_if_collection_exists(task_query.collection_id)
+
+        # If no other exception is thrown
+        logger.error("Unhandled exception")
+        raise integrity_error
 
 
 def get_tasks(request_args: TaskGetQueryArgsModel) -> MultiTasksRespModel:
@@ -44,7 +47,7 @@ def get_tasks(request_args: TaskGetQueryArgsModel) -> MultiTasksRespModel:
         ).scalar_one()
 
         if total_count == 0:
-            get_collection(request_args.collection_id)
+            check_if_collection_exists(request_args.collection_id)
             tasks: list[TaskTable] = list()
         else:
             query = query.limit(request_args.page_size).offset(request_args.skip)

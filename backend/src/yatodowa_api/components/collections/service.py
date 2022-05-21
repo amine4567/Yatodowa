@@ -18,18 +18,19 @@ def get_collections() -> list[CollectionRespModel]:
     return collections_response
 
 
-def get_collection(collection_id: UUID) -> CollectionTable:
+def check_if_collection_exists(collection_id: UUID) -> bool:
     with get_session() as session:
         query = sqlalchemy.select(CollectionTable).where(
             CollectionTable.collection_id == collection_id
         )
         try:
-            collection: CollectionTable = session.execute(query).scalar_one()
+            session.execute(query).scalar_one()
         except sqlalchemy.exc.NoResultFound:
             raise CollectionNotFoundError(
                 f"No collection with id={collection_id} exists."
             )
-    return collection
+        else:
+            return True
 
 
 def add_collection(
