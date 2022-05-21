@@ -3,19 +3,19 @@ from uuid import UUID
 from yatodowa_api.validation import StrictBaseModel, validators
 
 
-class CollectionQueryBody(StrictBaseModel):
+class CollectionPostQueryBodyModel(StrictBaseModel):
     name: str
     group_id: UUID | None
 
 
-class CollectionResponse(StrictBaseModel):
+class CollectionRespModel(StrictBaseModel):
     collection_id: UUID
     name: str
     group_id: UUID | None
 
 
-class CollectionsResponse(StrictBaseModel):
-    collections: list[CollectionResponse]
+class MultiCollectionsRespModel(StrictBaseModel):
+    collections: list[CollectionRespModel]
     count: int | None
 
     _count_validator: classmethod = validators.count_validator("collections", "count")

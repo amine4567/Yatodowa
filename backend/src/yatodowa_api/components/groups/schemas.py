@@ -3,13 +3,13 @@ from uuid import UUID
 from yatodowa_api.validation import StrictBaseModel, validators
 
 
-class GroupResponse(StrictBaseModel):
+class GroupResponseModel(StrictBaseModel):
     group_id: UUID
     name: str
 
 
-class GroupsResponse(StrictBaseModel):
-    groups: list[GroupResponse]
+class MultiGroupsResponseModel(StrictBaseModel):
+    groups: list[GroupResponseModel]
     count: int | None
 
     _count_validator: classmethod = validators.count_validator("groups", "count")

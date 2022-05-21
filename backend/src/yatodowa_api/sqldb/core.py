@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import Session
 
 db = None
 
@@ -15,7 +16,7 @@ def get_db() -> SQLAlchemy:
 
 @contextmanager
 def get_session():
-    session = get_db().session
+    session: Session = get_db().session
     try:
         yield session
         session.commit()

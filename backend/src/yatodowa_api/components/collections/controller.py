@@ -2,7 +2,7 @@ import yatodowa_api.components.collections.service as CollectionService
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
-from .schemas import CollectionQueryBody, CollectionsResponse
+from .schemas import CollectionPostQueryBodyModel, MultiCollectionsRespModel
 
 collections_api = ValidatedBlueprint("collections_api", __name__)
 
@@ -10,11 +10,11 @@ collections_api = ValidatedBlueprint("collections_api", __name__)
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["GET"])
 def get_collections():
     collections = CollectionService.get_collections()
-    return CollectionsResponse(collections=collections), 200
+    return MultiCollectionsRespModel(collections=collections), 200
 
 
 @collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["POST"])
-def add_collection(request_body: CollectionQueryBody):
+def add_collection(request_body: CollectionPostQueryBodyModel):
     existing_collections_names = [
         elt.name for elt in CollectionService.get_collections()
     ]

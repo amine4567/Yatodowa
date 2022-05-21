@@ -3,26 +3,29 @@ from uuid import UUID
 from yatodowa_api.validation import StrictBaseModel, validators
 
 
-class TaskQueryBody(StrictBaseModel):
+class TaskPostQueryBodyModel(StrictBaseModel):
     text: str
     collection_id: UUID
 
 
-class TaskQueryArgs(StrictBaseModel):
-    pagination: int | None
-    skip: int | None
+class TaskGetQueryArgsModel(StrictBaseModel):
+    page_size: int = 100
+    skip: int = 0
     collection_id: UUID | None
 
 
-class TaskResponse(StrictBaseModel):
+class TaskRespModel(StrictBaseModel):
     task_id: UUID
     text: str
     completed: bool
     collection_id: UUID
 
 
-class TasksResponse(StrictBaseModel):
-    tasks: list[TaskResponse]
+class MultiTasksRespModel(StrictBaseModel):
+    tasks: list[TaskRespModel]
+    total_count: int
+    page_size: int
+    skip: int
     count: int | None
 
     _count_validator: classmethod = validators.count_validator("tasks", "count")

@@ -6,20 +6,23 @@ from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
-from .schemas import TaskQueryArgs, TaskQueryBody, TasksResponse
+from .schemas import TaskGetQueryArgsModel, TaskPostQueryBodyModel
 
 tasks_api = ValidatedBlueprint("tasks_api", __name__)
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["GET"])
-def get_tasks(request_args: TaskQueryArgs):
-    print(request_args)
-    tasks_response = TaskService.get_tasks()
-    return TasksResponse(tasks=tasks_response), 200
+def get_tasks(request_args: TaskGetQueryArgsModel):
+    try:
+        tasks_response = TaskService.get_tasks(request_args)
+    except CollectionNotFoundError as e:
+        return APICallError(type=ErrorType.GENERIC, message=str(e)), 400
+    else:
+        return tasks_response, 200
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])
-def add_task(request_body: TaskQueryBody):
+def add_task(request_body: TaskPostQueryBodyModel):
     try:
         task_response = TaskService.add_task(request_body)
     except CollectionNotFoundError as e:

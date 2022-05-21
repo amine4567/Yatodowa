@@ -7,6 +7,7 @@ from yatodowa_api.validation import validators
 class StrictBaseModel(BaseModel):
     class Config:
         extra = Extra.forbid
+        orm_mode = True
 
 
 class ErrorType(str, Enum):
