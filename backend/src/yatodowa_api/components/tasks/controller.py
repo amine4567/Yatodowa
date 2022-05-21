@@ -16,7 +16,7 @@ def get_tasks(request_args: TaskGetQueryArgsModel):
     try:
         tasks_response = TaskService.get_tasks(request_args)
     except CollectionNotFoundError as e:
-        return APICallError(type=ErrorType.GENERIC, message=str(e)), 400
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
     else:
         return tasks_response, 200
 
@@ -26,7 +26,7 @@ def add_task(request_body: TaskPostQueryBodyModel):
     try:
         task_response = TaskService.add_task(request_body)
     except CollectionNotFoundError as e:
-        return APICallError(type=ErrorType.GENERIC, message=str(e)), 400
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
     else:
         return task_response, 201
 
@@ -39,6 +39,6 @@ def delete_task(task_id: UUID):
     try:
         deleted_task = TaskService.delete_task(task_id)
     except TaskNotFoundError as e:
-        return APICallError(type=ErrorType.GENERIC, message=str(e)), 400
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
     else:
         return deleted_task, 200

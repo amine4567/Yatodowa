@@ -13,6 +13,7 @@ class StrictBaseModel(BaseModel):
 class ErrorType(str, Enum):
     GENERIC = "generic_error"
     VALIDATION = "validation_error"
+    MISSING_RESOURCE = "missing_resource_error"
 
 
 class APICallError(StrictBaseModel):
