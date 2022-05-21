@@ -136,5 +136,8 @@ config/local/*
 node_modules
 */.angular/cache
 
+# IDEs stuff
+.vscode
+
 # Misc
 _personal
