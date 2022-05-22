@@ -64,17 +64,14 @@ def get_tasks(request_args: TaskGetQueryArgsModel) -> MultiTasksRespModel:
 
 
 def delete_task(task_id: UUID) -> TaskRespModel:
-    with get_session():
-        query = TaskTable.query.filter(TaskTable.task_id == task_id)
-
-        query_results = query.all()
-        if len(query_results) == 0:
+    with get_session() as session:
+        task_to_delete: TaskTable = session.get(TaskTable, task_id)
+        if task_to_delete is None:
             raise TaskNotFoundError(
                 f"No task with task_id={task_id} exists in the database. "
                 "Nothing to delete."
             )
 
-        delete_results = query.delete()
-        assert delete_results == 1  # TODO
+        session.delete(task_to_delete)
 
-        return TaskRespModel(**query_results[0].to_dict())
+    return TaskRespModel.from_orm(task_to_delete)

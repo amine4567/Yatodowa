@@ -20,12 +20,8 @@ def get_collections() -> list[CollectionRespModel]:
 
 def check_if_collection_exists(collection_id: UUID) -> bool:
     with get_session() as session:
-        query = sqlalchemy.select(CollectionTable).where(
-            CollectionTable.collection_id == collection_id
-        )
-        try:
-            session.execute(query).scalar_one()
-        except sqlalchemy.exc.NoResultFound:
+        collection = session.get(CollectionTable, collection_id)
+        if collection is None:
             raise CollectionNotFoundError(
                 f"No collection with id={collection_id} exists."
             )
