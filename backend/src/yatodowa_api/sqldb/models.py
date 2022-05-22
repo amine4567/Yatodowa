@@ -11,13 +11,17 @@ db: SQLAlchemy = get_db()
 class GroupTable(db.Model):
     __tablename__ = "groups"
     group_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column(db.String(sqldb_consts.GROUP_NAME_MAX_LEN), unique=True)
+    name = db.Column(
+        db.String(sqldb_consts.GROUP_NAME_MAX_LEN), unique=True, nullable=False
+    )
 
 
 class CollectionTable(db.Model):
     __tablename__ = "collections"
     collection_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column(db.String(sqldb_consts.COLLECTION_NAME_MAX_LEN), unique=True)
+    name = db.Column(
+        db.String(sqldb_consts.COLLECTION_NAME_MAX_LEN), unique=True, nullable=False
+    )
     group_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("groups.group_id"), nullable=True
     )
@@ -33,8 +37,8 @@ class CollectionTable(db.Model):
 class TaskTable(db.Model):
     __tablename__ = "tasks"
     task_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    text = db.Column(db.String(sqldb_consts.TASK_TEXT_MAX_LEN))
-    completed = db.Column(db.Boolean, default=False)
+    text = db.Column(db.String(sqldb_consts.TASK_TEXT_MAX_LEN), nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
     collection_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("collections.collection_id"), nullable=False
     )
