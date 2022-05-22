@@ -37,22 +37,22 @@ def add_task(task_query: TaskPostQueryBodyModel) -> TaskRespModel:
 
 def get_tasks(request_args: TaskGetQueryArgsModel) -> MultiTasksRespModel:
     with get_session() as session:
-        query: sqlalchemy.sql.Select = sqlalchemy.select(TaskTable)
+        stmt: sqlalchemy.sql.Select = sqlalchemy.select(TaskTable)
 
         if request_args.collection_id is not None:
-            query = query.where(TaskTable.collection_id == request_args.collection_id)
+            stmt = stmt.where(TaskTable.collection_id == request_args.collection_id)
 
         total_count = session.execute(
-            sqlalchemy.select(sqlalchemy.func.count()).select_from(query)
+            sqlalchemy.select(sqlalchemy.func.count()).select_from(stmt)
         ).scalar_one()
 
         if total_count == 0:
             check_if_collection_exists(request_args.collection_id)
             tasks: list[TaskTable] = list()
         else:
-            query = query.limit(request_args.page_size).offset(request_args.skip)
+            stmt = stmt.limit(request_args.page_size).offset(request_args.skip)
 
-            tasks = session.execute(query).scalars().all()
+            tasks = session.execute(stmt).scalars().all()
 
     tasks_response = MultiTasksRespModel(
         tasks=[TaskRespModel.from_orm(task) for task in tasks],
