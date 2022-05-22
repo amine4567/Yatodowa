@@ -11,24 +11,25 @@ from .schemas import (
     MultiTasksRespModel,
     TaskGetQueryArgsModel,
     TaskPostQueryBodyModel,
+    TaskPutQueryBodyModel,
     TaskRespModel,
 )
 
 logger = logging.getLogger(__name__)
 
 
-def add_task(task_query: TaskPostQueryBodyModel) -> TaskRespModel:
+def add_task(request_body: TaskPostQueryBodyModel) -> TaskRespModel:
     try:
         with get_session() as session:
             task = TaskTable(
-                text=task_query.text, collection_id=task_query.collection_id
+                text=request_body.text, collection_id=request_body.collection_id
             )
             session.add(task)
 
         task_response = TaskRespModel.from_orm(task)
         return task_response
     except sqlalchemy.exc.IntegrityError as integrity_error:
-        check_if_collection_exists(task_query.collection_id)
+        check_if_collection_exists(request_body.collection_id)
 
         # If no other exception is thrown
         logger.error("Unhandled exception")
@@ -75,3 +76,31 @@ def delete_task(task_id: UUID) -> TaskRespModel:
         session.delete(task_to_delete)
 
     return TaskRespModel.from_orm(task_to_delete)
+
+
+def update_task(task_id: UUID, request_body: TaskPutQueryBodyModel):
+    try:
+        with get_session() as session:
+            task_to_update: TaskTable = session.get(TaskTable, task_id)
+            if task_to_update is None:
+                raise TaskNotFoundError(
+                    f"No task with task_id={task_id} exists in the database. "
+                    "Nothing to update."
+                )
+
+            if request_body.text is not None:
+                task_to_update.text = request_body.text
+
+            if request_body.completed is not None:
+                task_to_update.completed = request_body.completed
+
+            if request_body.collection_id is not None:
+                task_to_update.collection_id = request_body.collection_id
+    except sqlalchemy.exc.IntegrityError as integrity_error:
+        check_if_collection_exists(request_body.collection_id)
+
+        # If no other exception is thrown
+        logger.error("Unhandled exception")
+        raise integrity_error
+
+    return TaskRespModel.from_orm(task_to_update)

@@ -26,4 +26,4 @@ class APICallErrors(StrictBaseModel):
     errors: list[APICallError]
     errors_count: int | None
 
-    _count_validator: classmethod = validators.count_validator("errors", "errors_count")
+    _validate_count: classmethod = validators.validate_count("errors", "errors_count")

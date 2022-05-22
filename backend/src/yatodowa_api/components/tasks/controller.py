@@ -6,7 +6,11 @@ from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
-from .schemas import TaskGetQueryArgsModel, TaskPostQueryBodyModel
+from .schemas import (
+    TaskGetQueryArgsModel,
+    TaskPostQueryBodyModel,
+    TaskPutQueryBodyModel,
+)
 
 tasks_api = ValidatedBlueprint("tasks_api", __name__)
 
@@ -29,6 +33,23 @@ def add_task(request_body: TaskPostQueryBodyModel):
         return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
     else:
         return task_response, 201
+
+
+@tasks_api.route(
+    COMMON_API_ENDPOINT + "/tasks/<task_id>",
+    methods=["PUT"],
+)
+def update_task(request_body: TaskPutQueryBodyModel, task_id: UUID):
+    try:
+        updated_task = TaskService.update_task(
+            task_id=task_id, request_body=request_body
+        )
+    except TaskNotFoundError as e:
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
+    except CollectionNotFoundError as e:
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
+    else:
+        return updated_task, 200
 
 
 @tasks_api.route(

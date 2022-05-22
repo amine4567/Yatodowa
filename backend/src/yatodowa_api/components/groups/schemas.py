@@ -12,4 +12,4 @@ class MultiGroupsResponseModel(StrictBaseModel):
     groups: list[GroupResponseModel]
     count: int | None
 
-    _count_validator: classmethod = validators.count_validator("groups", "count")
+    _validate_count: classmethod = validators.validate_count("groups", "count")

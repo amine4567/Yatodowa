@@ -18,4 +18,4 @@ class MultiCollectionsRespModel(StrictBaseModel):
     collections: list[CollectionRespModel]
     count: int | None
 
-    _count_validator: classmethod = validators.count_validator("collections", "count")
+    _validate_count: classmethod = validators.validate_count("collections", "count")
