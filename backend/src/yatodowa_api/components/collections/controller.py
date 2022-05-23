@@ -1,7 +1,12 @@
+from uuid import UUID
+
 import yatodowa_api.components.collections.service as CollectionService
+import yatodowa_api.components.tasks.service as TaskService
+from yatodowa_api.components.common.schemas import PaginationArgsModel
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
+from .exceptions import CollectionNotFoundError
 from .schemas import CollectionPostQueryBodyModel, MultiCollectionsRespModel
 
 collections_api = ValidatedBlueprint("collections_api", __name__)
@@ -32,3 +37,19 @@ def add_collection(request_body: CollectionPostQueryBodyModel):
     collection = CollectionService.add_collection(request_body)
 
     return collection, 201
+
+
+@collections_api.route(
+    COMMON_API_ENDPOINT + "/collections/<collection_id>/tasks", methods=["GET"]
+)
+def get_collection_jobs(request_args: PaginationArgsModel, collection_id: UUID):
+    try:
+        tasks = TaskService.get_tasks(
+            page_size=request_args.page_size,
+            skip=request_args.skip,
+            collection_id=collection_id,
+        )
+    except CollectionNotFoundError as e:
+        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
+    else:
+        return tasks, 200

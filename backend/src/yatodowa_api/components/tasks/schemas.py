@@ -14,12 +14,6 @@ class TaskPostQueryBodyModel(StrictBaseModel):
     )
 
 
-class TaskGetQueryArgsModel(StrictBaseModel):
-    page_size: int = 100
-    skip: int = 0
-    collection_id: UUID | None
-
-
 class TaskPutQueryBodyModel(StrictBaseModel):
     text: str | None
     completed: bool | None

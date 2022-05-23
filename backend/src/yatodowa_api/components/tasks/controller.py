@@ -2,27 +2,22 @@ from uuid import UUID
 
 import yatodowa_api.components.tasks.service as TaskService
 from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
+from yatodowa_api.components.common.schemas import PaginationArgsModel
 from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
 from yatodowa_api.consts import COMMON_API_ENDPOINT
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
-from .schemas import (
-    TaskGetQueryArgsModel,
-    TaskPostQueryBodyModel,
-    TaskPutQueryBodyModel,
-)
+from .schemas import TaskPostQueryBodyModel, TaskPutQueryBodyModel
 
 tasks_api = ValidatedBlueprint("tasks_api", __name__)
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["GET"])
-def get_tasks(request_args: TaskGetQueryArgsModel):
-    try:
-        tasks_response = TaskService.get_tasks(request_args)
-    except CollectionNotFoundError as e:
-        return APICallError(type=ErrorType.MISSING_RESOURCE, message=str(e)), 400
-    else:
-        return tasks_response, 200
+def get_tasks(request_args: PaginationArgsModel):
+    tasks = TaskService.get_tasks(
+        page_size=request_args.page_size, skip=request_args.skip
+    )
+    return tasks, 200
 
 
 @tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])

@@ -9,7 +9,6 @@ from yatodowa_api.sqldb.models import TaskTable
 from .exceptions import TaskNotFoundError
 from .schemas import (
     MultiTasksRespModel,
-    TaskGetQueryArgsModel,
     TaskPostQueryBodyModel,
     TaskPutQueryBodyModel,
     TaskRespModel,
@@ -36,30 +35,33 @@ def add_task(request_body: TaskPostQueryBodyModel) -> TaskRespModel:
         raise integrity_error
 
 
-def get_tasks(request_args: TaskGetQueryArgsModel) -> MultiTasksRespModel:
+def get_tasks(
+    page_size: int, skip: int, collection_id: UUID = None
+) -> MultiTasksRespModel:
     with get_session() as session:
         stmt: sqlalchemy.sql.Select = sqlalchemy.select(TaskTable)
 
-        if request_args.collection_id is not None:
-            stmt = stmt.where(TaskTable.collection_id == request_args.collection_id)
+        if collection_id is not None:
+            stmt = stmt.where(TaskTable.collection_id == collection_id)
 
         total_count = session.execute(
             sqlalchemy.select(sqlalchemy.func.count()).select_from(stmt)
         ).scalar_one()
 
         if total_count == 0:
-            check_if_collection_exists(request_args.collection_id)
+            if collection_id is not None:
+                check_if_collection_exists(collection_id)
             tasks: list[TaskTable] = list()
         else:
-            stmt = stmt.limit(request_args.page_size).offset(request_args.skip)
+            stmt = stmt.limit(page_size).offset(skip)
 
             tasks = session.execute(stmt).scalars().all()
 
     tasks_response = MultiTasksRespModel(
         tasks=[TaskRespModel.from_orm(task) for task in tasks],
         total_count=total_count,
-        skip=request_args.skip,
-        page_size=request_args.page_size,
+        skip=skip,
+        page_size=page_size,
     )
     return tasks_response
 
