@@ -5,9 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { TopBarComponent } from './top-bar/top-bar.component';
-import { CurrentTasksListComponent } from './current-tasks-list/current-tasks-list.component';
-import { ListsMenuComponent } from './lists-menu/lists-menu.component';
+import { TopBarComponent } from './components/top-bar/top-bar.component';
+import { CurrentTasksListComponent } from './components/current-tasks-list/current-tasks-list.component';
+import { ListsMenuComponent } from './components/lists-menu/lists-menu.component';
 
 @NgModule({
   declarations: [
