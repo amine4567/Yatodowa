@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import { TasksService } from 'app/services/tasks.service';
 
 @Component({
@@ -7,14 +7,19 @@ import { TasksService } from 'app/services/tasks.service';
   styleUrls: ['./current-tasks-list.component.css'],
 })
 export class CurrentTasksListComponent implements OnInit {
+  @Input() collectionId: string = '';
+
   tasks: Array<any> = [];
   newTaskVal: string = '';
 
   constructor(private tasksService: TasksService) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    let selectedCollectionId = changes['collectionId'].currentValue;
     this.tasksService
-      .getTasks()
+      .getTasks(selectedCollectionId)
       .subscribe((response: any) => (this.tasks = response.tasks));
   }
 
