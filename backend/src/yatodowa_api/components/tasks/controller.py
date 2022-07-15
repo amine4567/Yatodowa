@@ -4,15 +4,17 @@ import yatodowa_api.components.tasks.service as TaskService
 from yatodowa_api.components.collections.exceptions import CollectionNotFoundError
 from yatodowa_api.components.common.schemas import PaginationArgsModel
 from yatodowa_api.components.tasks.exceptions import TaskNotFoundError
-from yatodowa_api.consts import COMMON_API_ENDPOINT
+from yatodowa_api.consts import COMMON_API_PREFIX
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
 from .schemas import TaskPostQueryBodyModel, TaskPutQueryBodyModel
 
-tasks_api = ValidatedBlueprint("tasks_api", __name__)
+tasks_api = ValidatedBlueprint(
+    "tasks_api", __name__, url_prefix=COMMON_API_PREFIX + "/tasks"
+)
 
 
-@tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["GET"])
+@tasks_api.route("/", methods=["GET"])
 def get_tasks(request_args: PaginationArgsModel):
     tasks = TaskService.get_tasks(
         page_size=request_args.page_size, skip=request_args.skip
@@ -20,7 +22,7 @@ def get_tasks(request_args: PaginationArgsModel):
     return tasks, 200
 
 
-@tasks_api.route(COMMON_API_ENDPOINT + "/tasks", methods=["POST"])
+@tasks_api.route("/", methods=["POST"])
 def add_task(request_body: TaskPostQueryBodyModel):
     try:
         task_response = TaskService.add_task(request_body)
@@ -31,7 +33,7 @@ def add_task(request_body: TaskPostQueryBodyModel):
 
 
 @tasks_api.route(
-    COMMON_API_ENDPOINT + "/tasks/<task_id>",
+    "/<task_id>",
     methods=["PUT"],
 )
 def update_task(request_body: TaskPutQueryBodyModel, task_id: UUID):
@@ -48,7 +50,7 @@ def update_task(request_body: TaskPutQueryBodyModel, task_id: UUID):
 
 
 @tasks_api.route(
-    COMMON_API_ENDPOINT + "/tasks/<task_id>",
+    "/<task_id>",
     methods=["DELETE"],
 )
 def delete_task(task_id: UUID):

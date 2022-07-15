@@ -3,22 +3,24 @@ from uuid import UUID
 import yatodowa_api.components.collections.service as CollectionService
 import yatodowa_api.components.tasks.service as TaskService
 from yatodowa_api.components.common.schemas import PaginationArgsModel
-from yatodowa_api.consts import COMMON_API_ENDPOINT
+from yatodowa_api.consts import COMMON_API_PREFIX
 from yatodowa_api.validation import APICallError, ErrorType, ValidatedBlueprint
 
 from .exceptions import CollectionNotFoundError
 from .schemas import CollectionPostQueryBodyModel, MultiCollectionsRespModel
 
-collections_api = ValidatedBlueprint("collections_api", __name__)
+collections_api = ValidatedBlueprint(
+    "collections_api", __name__, url_prefix=COMMON_API_PREFIX + "/collections"
+)
 
 
-@collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["GET"])
+@collections_api.route("/", methods=["GET"])
 def get_collections():
     collections = CollectionService.get_collections()
     return MultiCollectionsRespModel(collections=collections), 200
 
 
-@collections_api.route(COMMON_API_ENDPOINT + "/collections", methods=["POST"])
+@collections_api.route("/", methods=["POST"])
 def add_collection(request_body: CollectionPostQueryBodyModel):
     existing_collections_names = [
         elt.name for elt in CollectionService.get_collections()
@@ -39,10 +41,8 @@ def add_collection(request_body: CollectionPostQueryBodyModel):
     return collection, 201
 
 
-@collections_api.route(
-    COMMON_API_ENDPOINT + "/collections/<collection_id>/tasks", methods=["GET"]
-)
-def get_collection_jobs(request_args: PaginationArgsModel, collection_id: UUID):
+@collections_api.route("/<collection_id>/tasks", methods=["GET"])
+def get_collection_tasks(request_args: PaginationArgsModel, collection_id: UUID):
     try:
         tasks = TaskService.get_tasks(
             page_size=request_args.page_size,

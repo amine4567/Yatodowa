@@ -1,1 +1,1 @@
-COMMON_API_ENDPOINT = "/api/v1"
+COMMON_API_PREFIX = "/api/v1"
