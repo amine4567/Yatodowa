@@ -1,8 +1,17 @@
-<input type="text" id="newTask" name="newTask" [(ngModel)]="newTaskVal" />
-<button type="button" (click)="addTask()">+</button>
+<input pInputText type="text" id="newTask" name="newTask" [(ngModel)]="newTaskVal" />
+<button pButton icon="pi pi-check" class="p-button-rounded" (click)="addTask()"></button>
 
-<ul>
+<!-- <ul>
   <li *ngFor="let task of tasks; let i = index">
-    {{ task.text }} <button type="button" (click)="deleteTask(i)">x</button>
+    {{ task.text }} <button pButton pRipple  icon="pi pi-times" class="p-button-danger p-button-rounded p-button-outlined" (click)="deleteTask(i)"></button>
   </li>
-</ul>
+</ul> -->
+
+<p-dataView [value]="tasks" [paginator]="true" [rows]="27">
+  <ng-template pTemplate="header">{{selectedCollection ? selectedCollection.name : ""}} </ng-template>
+  <ng-template let-task pTemplate="listItem">
+      <div>
+          {{task.text}}
+      </div>
+  </ng-template>
+</p-dataView>

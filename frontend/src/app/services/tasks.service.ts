@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 export class TasksService {
   constructor(private http: HttpClient) {}
 
-  getTasks(collectionId: string) {
+  getTasks(collectionId: string | undefined) {
     let callUrl: string = '';
     if (collectionId) {
       callUrl = `http://127.0.0.1:4200/api/v1/collections/${collectionId}/tasks`;

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Collection } from 'app/services/collections.service';
 
 @Component({
   selector: 'app-root',
@@ -6,9 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  selectedCollectionId: string = '';
+  selectedCollection!: Collection;
 
-  setSelectedCollection(newCollectionId: string) {
-    this.selectedCollectionId = newCollectionId;
+  ngOnInit(): void {}
+
+  setSelectedCollection(newCollection: Collection) {
+    this.selectedCollection = newCollection;
   }
 }

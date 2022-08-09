@@ -3,3 +3,11 @@
   justify-content: center;
   align-items: center;
 }
+
+.app-lists-menu {
+  width: 10%;
+}
+
+.app-current-tasks-list {
+  width: 40%;
+}

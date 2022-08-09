@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import { TasksService } from 'app/services/tasks.service';
+import { Collection } from 'app/services/collections.service';
 
 @Component({
   selector: 'app-current-tasks-list',
@@ -7,17 +8,24 @@ import { TasksService } from 'app/services/tasks.service';
   styleUrls: ['./current-tasks-list.component.css'],
 })
 export class CurrentTasksListComponent implements OnInit {
-  @Input() collectionId: string = '';
+  @Input() selectedCollection!: Collection;
 
   tasks: Array<any> = [];
   newTaskVal: string = '';
 
+  checked: boolean = true;
+
   constructor(private tasksService: TasksService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.tasksService
+      .getTasks(undefined)
+      .subscribe((response: any) => (this.tasks = response.tasks));
+  }
 
   ngOnChanges(changes: SimpleChanges) {
-    let selectedCollectionId = changes['collectionId'].currentValue;
+    let selectedCollectionId =
+      changes['selectedCollection'].currentValue.collection_id;
     this.tasksService
       .getTasks(selectedCollectionId)
       .subscribe((response: any) => (this.tasks = response.tasks));
