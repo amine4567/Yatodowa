@@ -23,7 +23,12 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.css"],
+            "styles": [
+              "src/styles.css", 
+              "node_modules/primeng/resources/themes/saga-blue/theme.css", 
+              "node_modules/primeng/resources/primeng.min.css", 
+              "node_modules/primeicons/primeicons.css"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -92,6 +97,5 @@
         }
       }
     }
-  },
-  "defaultProject": "frontend"
+  }
 }
