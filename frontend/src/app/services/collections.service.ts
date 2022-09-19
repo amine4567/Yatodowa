@@ -10,7 +10,7 @@ export interface Collection {
 
 @Injectable({ providedIn: 'root' })
 export class CollectionsService {
-  collectionsUrl: string = 'http://127.0.0.1:4200/api/v1/collections';
+  collectionsUrl: string = '/api/v1/collections';
 
   constructor(private http: HttpClient) {}
 

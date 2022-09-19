@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { TasksService } from 'app/services/tasks.service';
 import { Collection } from 'app/services/collections.service';
 
@@ -23,16 +23,21 @@ export class CurrentTasksListComponent implements OnInit {
       .subscribe((response: any) => (this.tasks = response.tasks));
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    let selectedCollectionId =
-      changes['selectedCollection'].currentValue.collection_id;
-    this.tasksService
-      .getTasks(selectedCollectionId)
-      .subscribe((response: any) => (this.tasks = response.tasks));
+  ngOnChanges() {
+    this.refreshTasks()
+  }
+
+  refreshTasks() {
+    this.tasksService.getTasks(this.selectedCollection.collection_id).subscribe(
+      (response: any) => (this.tasks = response.tasks)
+    );
   }
 
   addTask() {
-    this.tasks.unshift(this.newTaskVal);
+    this.tasksService.addTask(
+      this.newTaskVal, 
+      this.selectedCollection.collection_id
+    ).subscribe(() => this.refreshTasks());
     this.newTaskVal = '';
   }
 
